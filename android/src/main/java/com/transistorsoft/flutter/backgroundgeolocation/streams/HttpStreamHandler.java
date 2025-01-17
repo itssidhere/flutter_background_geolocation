@@ -18,26 +18,16 @@ import io.flutter.plugin.common.EventChannel;
 
 public class HttpStreamHandler extends StreamHandler implements TSHttpResponseCallback {
     private static final int MAX_CACHE_SIZE = 10000;
-    private static final LinkedHashSet<String> processedUuids = new LinkedHashSet<>();
-    private static final LinkedHashSet<String> processedTimestamps = new LinkedHashSet<>();
+    private DatabaseHelper dbHelper;
 
     public HttpStreamHandler() {
         mEvent = BackgroundGeolocation.EVENT_HTTP;
     }
 
-    private void addToCache(LinkedHashSet set, Object value) {
-        if (set.size() >= MAX_CACHE_SIZE) {
-            Iterator it = set.iterator();
-            it.next();
-            it.remove();
-            TSLog.logger.debug("[HttpStreamHandler] Removed oldest entry from cache");
-        }
-        set.add(value);
-    }
-
     @Override
     public void onListen(Object args, EventChannel.EventSink eventSink) {
         super.onListen(args, eventSink);
+        dbHelper = new DatabaseHelper(mContext);
         
         BackgroundGeolocation.getInstance(mContext).setBeforeInsertBlock(tsLocation -> {
             try {
@@ -45,21 +35,24 @@ public class HttpStreamHandler extends StreamHandler implements TSHttpResponseCa
                 String uuid = tsLocation.getUUID();
                 String timestamp = tsLocation.getTimestamp();
 
-                if (processedUuids.contains(uuid)) {
+                if (dbHelper.isDuplicate(uuid, "uuid")) {
                     TSLog.logger.debug("[HttpStreamHandler] Skipping location with duplicate UUID: " + uuid);
                     return null;
                 }
 
-                if (processedTimestamps.contains(timestamp)) {
+                if (dbHelper.isDuplicate(timestamp, "timestamp")) {
                     TSLog.logger.debug("[HttpStreamHandler] Skipping location with duplicate timestamp: " + timestamp);
                     return null;
                 }
 
-                addToCache(processedUuids, uuid);
-                addToCache(processedTimestamps, timestamp);
+                dbHelper.addEntry(uuid, timestamp);
+                dbHelper.maintainCacheSize(MAX_CACHE_SIZE);
              
                 JSONObject json = tsLocation.toJson();
+
+
                 TSLog.logger.debug("[HttpStreamHandler] Location JSON: " + json.toString());
+
                 return json;
             } catch (Exception e) {
                 TSLog.logger.error(TSLog.error(e.getMessage()));
