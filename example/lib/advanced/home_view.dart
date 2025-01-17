@@ -82,7 +82,7 @@ class HomeViewState extends State<HomeView> with TickerProviderStateMixin<HomeVi
     String? username = prefs.getString("username");
 
     // Sanity check orgname & username:  if invalid, go back to HomeApp to re-register device.
-    if (orgname == null || username == null) {
+    if (username == null) {
       return runApp(HomeApp());
     }
 
@@ -157,10 +157,8 @@ class HomeViewState extends State<HomeView> with TickerProviderStateMixin<HomeVi
 
     // Which tab to view?  MapView || EventList.   Must wait until after build before switching tab or bad things happen.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (tabIndex != null) {
-        _tabController?.animateTo(tabIndex);
-      }
-    });
+      _tabController?.animateTo(tabIndex ?? 0);
+        });
   }
 
   // Configure BackgroundFetch (not required by BackgroundGeolocation).

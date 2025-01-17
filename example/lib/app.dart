@@ -80,25 +80,25 @@ class _HomeViewState extends State<_HomeView> {
     prefs.setString("app", "");
 
     // Set username.
-    String? username = prefs.getString("username");
-    String? orgname = prefs.getString("orgname");
+    String username = prefs.getString("username") ?? '';
+    String orgname = prefs.getString("orgname") ?? '';
 
-    if (_usernameIsValid(username!) && (orgname == null)) {
+    if (_usernameIsValid(username) && (orgname.isEmpty)) {
       await prefs.remove('username');
       await prefs.setString('orgname', username);
       orgname = username;
-      username = null;
+      username = '';
     }
 
     setState(() {
-      _orgname = (orgname != null) ? orgname : '';
-      _username = (username != null) ? username : '';
-      _deviceId = (username != null)
+      _orgname = orgname;
+      _username = username;
+      _deviceId = (username.isEmpty)
           ? "${_deviceInfo.model}-$_username"
           : _deviceInfo.model;
     });
 
-    if (!_usernameIsValid(username!) || !_usernameIsValid(orgname!)) {
+    if (!_usernameIsValid(_username) || !_usernameIsValid(_orgname)) {
       _showRegistration();
     }
   }

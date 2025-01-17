@@ -520,7 +520,7 @@ class Test {
     // Request a JWT from tracker.transistorsoft.com
     bg.TransistorAuthorizationToken token =
         await bg.TransistorAuthorizationToken.findOrCreate(
-            orgname!, username!, ENV.TRACKER_HOST);
+            orgname ?? '', username ?? '', ENV.TRACKER_HOST ?? '');
 
     List<String> schedule = [];
     bg.State state = await bg.BackgroundGeolocation.state;

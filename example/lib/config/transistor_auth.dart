@@ -39,9 +39,9 @@ class TransistorAuth {
     try {
       SharedPreferences prefs = await _prefs;
       // Request a JWT from tracker.transistorsoft.com
-      String? orgname = prefs.getString("orgname");
-      String? username = prefs.getString("username");
-      if (orgname == null || username == null) {
+      String orgname = prefs.getString("orgname") ?? '';
+      String username = prefs.getString("username") ?? '';
+      if (username.isEmpty) {
         // TODO throw an Error instead.
         return false;
       }

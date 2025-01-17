@@ -1100,9 +1100,8 @@ class BackgroundGeolocation {
       found.subscription.cancel();
       _subscriptions.remove(found);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
   /// Subscribe to motionchange events

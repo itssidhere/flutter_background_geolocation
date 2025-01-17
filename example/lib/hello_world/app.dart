@@ -65,11 +65,11 @@ class _HelloWorldPageState extends State<HelloWorldPage> {
 
   Future _initPlatformState() async {
     SharedPreferences prefs = await _prefs;
-    String? orgname = prefs.getString("orgname");
-    String? username = prefs.getString("username");
+    String orgname = prefs.getString("orgname") ?? '';
+    String username = prefs.getString("username") ?? '';
 
     // Sanity check orgname & username:  if invalid, go back to HomeApp to re-register device.
-    if (orgname == null || username == null) {
+    if (username.isEmpty) {
       return runApp(HomeApp());
     }
 

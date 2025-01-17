@@ -160,10 +160,10 @@ void main() {
 
     // Sanitize old-style registration system that only required username.
     // If we find a valid username but null orgname, reverse them.
-    String? orgname = prefs.getString("orgname");
-    String? username = prefs.getString("username");
+    String orgname = prefs.getString("orgname") ?? '';
+    String username = prefs.getString("username") ?? '';
 
-    if (orgname == null && username != null) {
+    if (orgname.isEmpty) {
       prefs.setString("orgname", username);
       prefs.remove("username");
     }

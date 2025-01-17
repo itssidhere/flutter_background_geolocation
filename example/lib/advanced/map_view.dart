@@ -125,29 +125,14 @@ class MapViewState extends State<MapView> with AutomaticKeepAliveClientMixin<Map
     _polyline.add(LatLng(event.location.coords.latitude, event.location.coords.longitude));
     GeofenceMarker? marker = _geofences.firstWhereOrNull(
         (GeofenceMarker marker) => marker.geofence?.identifier == event.identifier);
-    if (marker == null) {
-      bool exists = await bg.BackgroundGeolocation.geofenceExists(event.identifier);
-      if (exists) {
-        // Maybe this is a boot from a geofence event and geofencechange hasn't yet fired
-        bg.Geofence? geofence = await bg.BackgroundGeolocation.getGeofence(event.identifier);
-        marker = GeofenceMarker(geofence!);
-        _geofences.add(marker);
-      } else {
-        print(
-            "[_onGeofence] failed to find geofence marker: ${event.identifier}");
-        return;
-      }
-    }
 
-    bg.Geofence? geofence = marker.geofence;
+    bg.Geofence? geofence = marker?.geofence;
 
     // Render a new greyed-out geofence CircleMarker to show it's been fired but only if it hasn't been drawn yet.
     // since we can have multiple hits on the same geofence.  No point re-drawing the same hit circle twice.
     GeofenceMarker? eventMarker = _geofenceEvents.firstWhereOrNull(
         (GeofenceMarker marker) =>
             marker.geofence?.identifier == event.identifier);
-    if (eventMarker == null)
-      _geofenceEvents.add(GeofenceMarker(geofence!, true));
 
     // Build geofence hit statistic markers:
     // 1.  A computed CircleMarker upon the edge of the geofence circle (red=exit, green=enter)

@@ -110,8 +110,8 @@ void _test(String action, Function(String) callback, [int? timeout]) async {
   }
   Duration duration = Duration(seconds: timeout);
   test(action, () async {
-    String? response = await driver?.requestData(action, timeout: duration);
-    log(action, response!);
+    String response = await driver?.requestData(action, timeout: duration) ?? '';
+    log(action, response);
     callback(response);
   });
 }
