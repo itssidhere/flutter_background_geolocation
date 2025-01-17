@@ -19,7 +19,7 @@ import io.flutter.plugin.common.EventChannel;
 public class HttpStreamHandler extends StreamHandler implements TSHttpResponseCallback {
     private static final int MAX_CACHE_SIZE = 10000;
     private static final LinkedHashSet<String> processedUuids = new LinkedHashSet<>();
-    private static final LinkedHashSet<Long> processedTimestamps = new LinkedHashSet<>();
+    private static final LinkedHashSet<String> processedTimestamps = new LinkedHashSet<>();
 
     public HttpStreamHandler() {
         mEvent = BackgroundGeolocation.EVENT_HTTP;
@@ -43,7 +43,7 @@ public class HttpStreamHandler extends StreamHandler implements TSHttpResponseCa
             try {
                 TSLog.logger.debug("[HttpStreamHandler] beforeInsertBlock called");
                 String uuid = tsLocation.getUUID();
-                long timestamp = tsLocation.getTimestamp();
+                String timestamp = tsLocation.getTimestamp();
 
                 if (processedUuids.contains(uuid)) {
                     TSLog.logger.debug("[HttpStreamHandler] Skipping location with duplicate UUID: " + uuid);
@@ -57,7 +57,10 @@ public class HttpStreamHandler extends StreamHandler implements TSHttpResponseCa
 
                 addToCache(processedUuids, uuid);
                 addToCache(processedTimestamps, timestamp);
-                return tsLocation.toJson();
+             
+                JSONObject json = tsLocation.toJson();
+                TSLog.logger.debug("[HttpStreamHandler] Location JSON: " + json.toString());
+                return json;
             } catch (Exception e) {
                 TSLog.logger.error(TSLog.error(e.getMessage()));
                 return null;
